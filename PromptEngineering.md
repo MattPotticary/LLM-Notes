@@ -1,7 +1,5 @@
 # Prompt engineering
 
-[Home](outline.md)
-
 - [Prompt engineering](#prompt-engineering)
   - [Prompt Engineering Terminology](#prompt-engineering-terminology)
   - [Techniques](#techniques)

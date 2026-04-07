@@ -1,14 +1,15 @@
 # RAG
 
+This document provides an overview of Retrieval-Augmented Generation (RAG) systems, serving as a reference for key concepts and considerations for: architecture, data ingestion strategies, retrieval techniques, context relevance filtering, generation methods, evaluation measures, security concerns, and tools/frameworks in the RAG ecosystem.
+
 - [RAG](#rag)
   - [RAG Terminology](#rag-terminology)
   - [Architecture](#architecture)
   - [Data Ingestion](#data-ingestion)
     - [Data Sources](#data-sources)
     - [Preprocessing](#preprocessing)
-    - [Embeddings / Alternatives](#embeddings--alternatives)
+    - [Embeddings](#embeddings)
       - [Embedding Techniques](#embedding-techniques)
-      - [Alternatives to Embeddings](#alternatives-to-embeddings)
     - [Storage and Optimization](#storage-and-optimization)
     - [Chunking](#chunking)
     - [Metadata](#metadata)
@@ -77,21 +78,20 @@ Data comes in many forms and from many sources, and the ingestion strategy and p
 - Language detection and filtering
 - OCR for images/documents
 
-### Embeddings / Alternatives
+### Embeddings
 
 #### Embedding Techniques
 
-- Dense Embeddings
-- Sparse Embeddings
-- Multi-modal Embeddings
-- Fine-tuned Embeddings
-
-#### Alternatives to Embeddings
-
-- TF-IDF: term frequency-inverse document frequency for keyword-based relevance scoring.
-- BM25: an improved version of TF-IDF that considers term saturation and document length normalization.
+- Dense Embeddings: models like BERT, RoBERTa, or Sentence Transformers to create dense vector representations of documents and queries.
+- Contextual Embeddings: models that generate embeddings based on the context of the query and document (e.g., using cross-encoders).
+- Multi-modal Embeddings: combining embeddings from different modalities (e.g., text and images).
+- Domain specific fine-tuned Embeddings: embeddings that have been fine-tuned for a specific task or domain.
+- Sparse Embeddings: techniques like TF-IDF, BM25 to create sparse vector representations.
+  - TF-IDF: term frequency-inverse document frequency for keyword-based relevance scoring.
+  - BM25 is an improved version of TF-IDF that considers term saturation and document length normalization.
 - Keyword-based Search: using inverted indices to quickly find documents containing specific keywords.
 - Hybrid Approaches / combining embeddings with keyword search: using embeddings for semantic similarity while also leveraging keyword matches for precision.
+- Knowledge Graph Embeddings: representing entities and relationships in a knowledge graph as vectors for retrieval.
 
 ### Storage and Optimization
 

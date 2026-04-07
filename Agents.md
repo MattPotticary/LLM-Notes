@@ -1,7 +1,5 @@
 # Agents
 
-[Home](outline.md)
-
 - [Agents](#agents)
   - [Agent Terminology](#agent-terminology)
   - [Types of Agents](#types-of-agents)

@@ -1,12 +1,10 @@
 # RAG
 
-[Home](outline.md)
-
 - [RAG](#rag)
   - [RAG Terminology](#rag-terminology)
   - [Architecture](#architecture)
   - [Data Ingestion](#data-ingestion)
-  - [Data Sources](#data-sources)
+    - [Data Sources](#data-sources)
     - [Preprocessing](#preprocessing)
     - [Storage and Optimization](#storage-and-optimization)
     - [Chunking](#chunking)
@@ -44,22 +42,26 @@
 
 ## Architecture
 
-- Traditional Vector search
-- Memory RAG
-- Hybrid RAG (Knowledge graphs)
-- Hypothetical Document Embeddings
-- Corrective RAG
-- Self-RAG
-- Agentic RAG
+A RAG system is generally made up of 3 main components: the first being a query recieved from the user, the second being a retriever which searches a corpus of documents for relevant information, and the third being a generator (LLM) which takes the retrieved information and produces a final answer.
+
+- Traditional Vector search: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
+- Memory RAG: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
+- Hybrid RAG (Knowledge graphs): Combines vector search with structured knowledge graphs to enhance retrieval and reasoning capabilities.
+- Hypothetical Document Embeddings: Instead of embedding the original documents, this approach generates hypothetical documents based on the query and embeds those for retrieval.
+- Corrective RAG: Uses feedback from the generator to iteratively refine the retrieval process, improving relevance over time.
+- Self-RAG: The model retrieves information from its own generated content or internal knowledge, rather than an external corpus.
+- Agentic RAG: Integrates RAG into an agent architecture, allowing for multi-step reasoning and interaction with external tools or APIs during the retrieval and generation process.
 
 ## Data Ingestion
+
+Data ingestion strategies for RAG systems can vary based on the use case and requirements. Some common approaches include:
 
 - Static: One-time batch ingestion of a fixed corpus.
 - Dynamic: Continuous updating of the corpus with new information.
 - Batch: Periodic ingestion of data in batches.
 - Streaming: Immediate ingestion of data as it becomes available.
 
-## Data Sources
+### Data Sources
 
 - Binary formats (images, audio, video, PDFs) - requires specialized processing (OCR, speech-to-text)
 - Text data (HTML, Markdown, TXT) - requires parsing and cleaning

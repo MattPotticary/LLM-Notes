@@ -6,11 +6,11 @@
   - [Data Ingestion](#data-ingestion)
     - [Data Sources](#data-sources)
     - [Preprocessing](#preprocessing)
-    - [Storage and Optimization](#storage-and-optimization)
-    - [Chunking](#chunking)
     - [Embeddings / Alternatives](#embeddings--alternatives)
       - [Embedding Techniques](#embedding-techniques)
       - [Alternatives to Embeddings](#alternatives-to-embeddings)
+    - [Storage and Optimization](#storage-and-optimization)
+    - [Chunking](#chunking)
     - [Metadata](#metadata)
   - [Retrieval](#retrieval)
   - [Context Relevance Filtering](#context-relevance-filtering)
@@ -63,9 +63,11 @@ Data ingestion strategies for RAG systems can vary based on the use case and req
 
 ### Data Sources
 
+Data comes in many forms and from many sources, and the ingestion strategy and preprocessing will depend on the specific use case. Some common data sources include:
+
 - Binary formats (images, audio, video, PDFs) - requires specialized processing (OCR, speech-to-text)
 - Text data (HTML, Markdown, TXT) - requires parsing and cleaning
-- Stuctured data (spreadsheets)
+- Structured data (spreadsheets)
 
 ### Preprocessing
 
@@ -74,25 +76,6 @@ Data ingestion strategies for RAG systems can vary based on the use case and req
 - Deduplication
 - Language detection and filtering
 - OCR for images/documents
-
-### Storage and Optimization
-
-- Compression techniques
-- Caching strategies
-- Scalability considerations (distributed systems)
-- Cost optimization (e.g., embedding model selection)
-
-### Chunking
-
-- Sentance
-- Document
-- Page
-- Paragraph
-- Semantic
-- LLM based
-- Recursive Character Splitting
-- Fized chunk size
-- Parent / Child ?? Late Chunking??
 
 ### Embeddings / Alternatives
 
@@ -110,7 +93,41 @@ Data ingestion strategies for RAG systems can vary based on the use case and req
 - Keyword-based Search: using inverted indices to quickly find documents containing specific keywords.
 - Hybrid Approaches / combining embeddings with keyword search: using embeddings for semantic similarity while also leveraging keyword matches for precision.
 
+### Storage and Optimization
+
+- Compression techniques
+- Caching strategies
+- Scalability considerations (distributed systems)
+- Cost optimization (e.g., embedding model selection)
+
+### Chunking
+
+For textual documents, different chunking strategies can be employed to break down documents into manageable pieces for retrieval and generation. Ideally we want to minimize the amount of irrelevant information included in each chunk while maximizing the amount of relevant information.
+
+The simplest chunking strategy is to use a fixed chunk size, where the document is split into equal-sized chunks based on a predetermined number of tokens or characters, this technique is easy to implement and was the traditional approach used in early RAG systems due to limitation of model context sizes. However, this approach may not always align well with natural language boundaries and can lead to fragmented information.
+
+To get around this, another set of strategies include breaking the document down into structural units such as:
+
+- Document
+- Page
+- Paragraph
+- Sentence
+
+This approach can help preserve the semantic integrity of the information and improve retrieval relevance, but it may require more complex parsing and may result in variable chunk sizes that need to be managed effectively.
+
+Where as other strategies may focus on token counts or semantic boundaries:
+
+- Semantic
+- LLM based
+
+Other strategies may involve more complex approaches such as:
+
+- Recursive Character Splitting
+- Parent / Child ?? Late Chunking??
+
 ### Metadata
+
+Typically as the dataset is ingested and split up into chunks, various metadata is stored along with the chunk to provide additional context and information for retrieval and generation. Common metadata fields include:
 
 - Document ID
 - Creation / Modified Datetime

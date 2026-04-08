@@ -1,0 +1,11 @@
+flowchart TD
+    A[/Query/] --> B[Retrieval]
+    B-->V[(Vector Store)]
+    V --> B
+    B --> D{Self Grading}
+    D --> G[Generator]
+    D --> B
+    G --> R{Reflective Loop}
+    R --> B
+    R --> G
+    R --> E[/Output/]

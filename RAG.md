@@ -6,9 +6,8 @@ This document provides an overview of Retrieval-Augmented Generation (RAG) syste
   - [RAG Terminology](#rag-terminology)
   - [Architecture](#architecture)
   - [Data Ingestion](#data-ingestion)
-    - [Data Sources](#data-sources)
     - [Preprocessing](#preprocessing)
-    - [Storage and Optimization](#storage-and-optimization)
+    - [Engineering considerations](#engineering-considerations)
     - [Chunking](#chunking)
     - [Embeddings](#embeddings)
     - [Metadata](#metadata)
@@ -44,13 +43,33 @@ This document provides an overview of Retrieval-Augmented Generation (RAG) syste
 
 A RAG system is generally made up of 3 main components: the first being a query recieved from the user, the second being a retriever which searches a corpus of documents for relevant information, and the third being a generator (LLM) which takes the retrieved information and produces a final answer.
 
-- Traditional Vector search: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
-- Memory RAG: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
-- Hybrid RAG (Knowledge graphs): Combines vector search with structured knowledge graphs to enhance retrieval and reasoning capabilities.
-- Hypothetical Document Embeddings: Instead of embedding the original documents, this approach generates hypothetical documents based on the query and embeds those for retrieval.
-- Corrective RAG: Uses feedback from the generator to iteratively refine the retrieval process, improving relevance over time.
-- Self-RAG: The model retrieves information from its own generated content or internal knowledge, rather than an external corpus.
-- Agentic RAG: Integrates RAG into an agent architecture, allowing for multi-step reasoning and interaction with external tools or APIs during the retrieval and generation process.
+Vector search: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
+
+![Vector search architecture](assets\vector_retrieval.svg)
+
+Memory RAG: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
+
+![Memory RAG architecture](assets\memory_rag.svg)
+
+Hybrid RAG (Knowledge graphs): Combines vector search with structured knowledge graphs to enhance retrieval and reasoning capabilities.
+
+![Hybrid RAG architecture](assets\hybrid_rag.svg)
+
+Hypothetical Document Embeddings: Instead of embedding the original documents, this approach generates hypothetical documents based on the query and embeds those for retrieval.
+
+![Hypothetical Document Embeddings architecture](assets\hypo_rag.svg)
+
+Corrective RAG: Uses feedback from the generator to iteratively refine the retrieval process, improving relevance over time.
+
+![Corrective RAG architecture](assets\cor_rag.svg)
+
+Self-RAG: The model retrieves information from its own generated content or internal knowledge, rather than an external corpus.
+
+![Self-RAG architecture](assets\self_rag.svg)
+
+Agentic RAG: Integrates RAG into an agent architecture, allowing for multi-step reasoning and interaction with external tools or APIs during the retrieval and generation process.
+
+![Agentic RAG architecture](assets\agentic_rag.svg)
 
 ## Data Ingestion
 
@@ -61,8 +80,6 @@ Data ingestion strategies for RAG systems can vary based on the use case and req
 - Batch: Periodic ingestion of data in batches.
 - Streaming: Immediate ingestion of data as it becomes available.
 
-### Data Sources
-
 Data comes in many forms and from many sources, and the ingestion strategy and preprocessing will depend on the specific use case. Some common data sources include:
 
 - Binary formats (images, audio, video, PDFs) - requires specialized processing (OCR, speech-to-text)
@@ -71,17 +88,15 @@ Data comes in many forms and from many sources, and the ingestion strategy and p
 
 ### Preprocessing
 
-- Text extraction and cleaning
-- Normalization (lowercasing, removing punctuation)
-- Deduplication
-- Language detection and filtering
+- Text extraction, cleaning, and normalization
+- Document deduplication
 - OCR for images/documents
 
-### Storage and Optimization
+### Engineering considerations
 
 - Compression techniques
 - Caching strategies
-- Scalability considerations (distributed systems)
+- Scalability considerations
 - Cost optimization (e.g., embedding model selection)
 
 ### Chunking

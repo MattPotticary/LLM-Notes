@@ -1,0 +1,8 @@
+flowchart TD
+    A[/Query/] --> H[Hypothetical Document]
+    H --> B[Retrieval]
+    B-->V[(Vector Store)]
+    V --> B
+    B --> D[Generator]
+    H --> D
+    D --> E[/Output/]

@@ -1,0 +1,8 @@
+flowchart TD
+    A[/Query/] --> B[Retrieval]
+    B-->V[(Vector DB)]
+    B-->K[(Knowledge Graph)]
+    V --> B
+    K --> B
+    B --> D[Generator]
+    D --> E[/Output/]

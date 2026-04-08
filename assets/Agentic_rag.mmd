@@ -1,0 +1,9 @@
+flowchart TD
+    A[/Query/] --> Agent[Agent]
+    Agent --> B[Retrieval]
+    B-->V[(Vector Store)]
+    V --> B
+    B --> G[Generator]
+    G --> R{Reflective Loop}
+    R --> Agent
+    R --> E[/Output/]

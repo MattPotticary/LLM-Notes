@@ -45,31 +45,31 @@ A RAG system is generally made up of 3 main components: the first being a query 
 
 Vector search: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
 
-![Vector search architecture](assets\vector_retrieval.svg)
+![Vector search architecture](assets/vector_retrieval.svg)
 
 Memory RAG: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
 
-![Memory RAG architecture](assets\memory_rag.svg)
+![Memory RAG architecture](assets/memory_rag.svg)
 
 Hybrid RAG (Knowledge graphs): Combines vector search with structured knowledge graphs to enhance retrieval and reasoning capabilities.
 
-![Hybrid RAG architecture](assets\hybrid_rag.svg)
+![Hybrid RAG architecture](assets/hybrid_rag.svg)
 
 Hypothetical Document Embeddings: Instead of embedding the original documents, this approach generates hypothetical documents based on the query and embeds those for retrieval.
 
-![Hypothetical Document Embeddings architecture](assets\hypo_rag.svg)
+![Hypothetical Document Embeddings architecture](assets/hypo_rag.svg)
 
 Corrective RAG: Uses feedback from the generator to iteratively refine the retrieval process, improving relevance over time.
 
-![Corrective RAG architecture](assets\cor_rag.svg)
+![Corrective RAG architecture](assets/cor_rag.svg)
 
 Self-RAG: The model retrieves information from its own generated content or internal knowledge, rather than an external corpus.
 
-![Self-RAG architecture](assets\self_rag.svg)
+![Self-RAG architecture](assets/self_rag.svg)
 
 Agentic RAG: Integrates RAG into an agent architecture, allowing for multi-step reasoning and interaction with external tools or APIs during the retrieval and generation process.
 
-![Agentic RAG architecture](assets\agentic_rag.svg)
+![Agentic RAG architecture](assets/agentic_rag.svg)
 
 ## Data Ingestion
 

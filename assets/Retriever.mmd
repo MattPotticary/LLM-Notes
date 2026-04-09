@@ -1,0 +1,11 @@
+flowchart TD
+    Query[/Query/] --> Retriever
+    subgraph Retriever
+        Embedding[Embedding Model]
+        Vector
+        Limit
+    end
+    Embedding --> Vector[Vector]
+    Vector -- Vector search --> Knowledge[(Knowledge base)]
+    Knowledge --Vector distance--> Limit[Threshold values]
+    Limit --> Retrieval@{ shape: docs, label: "Similar Documents"}

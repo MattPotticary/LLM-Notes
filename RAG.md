@@ -41,35 +41,43 @@ This document provides an overview of Retrieval-Augmented Generation (RAG) syste
 
 ## Architecture
 
-A RAG system is generally made up of 3 main components: the first being a query recieved from the user, the second being a retriever which searches a corpus of documents for relevant information, and the third being a generator (LLM) which takes the retrieved information and produces a final answer.
+A RAG system is generally made up of two main components: the first being a retriever which searches a corpus of documents for relevant information based upon similarity to the query, and the second being a generator (LLM) which takes the retrieved information with the original query and produces a final answer.
 
-Vector search: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
+**Vector search**: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
 
-![Vector search architecture](assets/vector_retrieval.svg)
+![Vector search architecture](assets/RAG.mmd.svg)
+![Retriever](assets/Retriever.mmd.svg)
+![Generator](assets/Generator.mmd.svg)
 
-Memory RAG: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
+The main things to tweak with the traditional RAG architecture are the retriever and generator components
+For the retriever you can use a different embedding model, a different form of vector search, or how many retrieved documents to consider. This allows for the retriever to be optimized for how many documents are retrieved and the relevance of those documents against the engineering constraints of latency, DB size, and cost.
 
-![Memory RAG architecture](assets/memory_rag.svg)
+For the generator you can use a large language model, temperature, or system prompt. This allows the generator to be optimized for the quality of the final answer, the creativity of the response, and how much it relies on the retrieved context.
 
-Hybrid RAG (Knowledge graphs): Combines vector search with structured knowledge graphs to enhance retrieval and reasoning capabilities.
+**Memory RAG**: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
+This has the potential to improve the relevance of retrieved information by considering the context of previous queries and responses, allowing for more personalized and context-aware generation.
 
-![Hybrid RAG architecture](assets/hybrid_rag.svg)
+![Memory RAG architecture](assets/Memory_rag.mmd.svg)
 
-Hypothetical Document Embeddings: Instead of embedding the original documents, this approach generates hypothetical documents based on the query and embeds those for retrieval.
+**Hybrid RAG (Knowledge graphs)**: Combines vector search with structured knowledge graphs to enhance retrieval and reasoning capabilities.
 
-![Hypothetical Document Embeddings architecture](assets/hypo_rag.svg)
+![Hybrid RAG architecture](assets/Hybrid_rag.mmd.svg)
 
-Corrective RAG: Uses feedback from the generator to iteratively refine the retrieval process, improving relevance over time.
+**Hypothetical Document Embeddings**: Instead of embedding the original documents, this approach generates hypothetical documents based on the query and embeds those for retrieval.
 
-![Corrective RAG architecture](assets/cor_rag.svg)
+![Hypothetical Document Embeddings architecture](assets/Hypo_rag.mmd.svg)
 
-Self-RAG: The model retrieves information from its own generated content or internal knowledge, rather than an external corpus.
+**Corrective RAG**: Uses feedback from the generator to iteratively refine the retrieval process, improving relevance over time.
 
-![Self-RAG architecture](assets/self_rag.svg)
+![Corrective RAG architecture](assets/Cor_rag.svg)
 
-Agentic RAG: Integrates RAG into an agent architecture, allowing for multi-step reasoning and interaction with external tools or APIs during the retrieval and generation process.
+**Self-RAG**: The model retrieves information from its own generated content or internal knowledge, rather than an external corpus.
 
-![Agentic RAG architecture](assets/agentic_rag.svg)
+![Self-RAG architecture](assets/Self_rag.mmd.svg)
+
+**Agentic RAG**: Integrates RAG into an agent architecture, allowing for multi-step reasoning and interaction with external tools or APIs during the retrieval and generation process.
+
+![Agentic RAG architecture](assets/Agentic_rag.mmd.svg)
 
 ## Data Ingestion
 

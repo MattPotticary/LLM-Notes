@@ -1,0 +1,9 @@
+flowchart TD
+    Retrieval@{ shape: docs, label: "Similar Documents"}
+    Query[/Query/] --> System
+    Retrieval --> System
+    subgraph Generator
+        System[System Prompt] --> GeneratorModel
+        GeneratorModel[LLM]
+    end
+    GeneratorModel --> GeneratedText[Generated Text]

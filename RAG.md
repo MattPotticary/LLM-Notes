@@ -12,7 +12,7 @@ This document provides an overview of Retrieval-Augmented Generation (RAG) syste
     - [Embeddings](#embeddings)
     - [Metadata](#metadata)
   - [Retrieval](#retrieval)
-  - [Context Relevance Filtering](#context-relevance-filtering)
+    - [Context Relevance Filtering](#context-relevance-filtering)
   - [Generation](#generation)
   - [Evaluation Measures](#evaluation-measures)
   - [Security Concerns](#security-concerns)
@@ -46,8 +46,6 @@ A RAG system is generally made up of two main components: the first being a retr
 **Vector search**: Embeddings are used to represent documents and queries in a high-dimensional space, allowing for semantic similarity search.
 
 ![Vector search architecture](assets/RAG.mmd.svg)
-![Retriever](assets/Retriever.mmd.svg)
-![Generator](assets/Generator.mmd.svg)
 
 The main things to tweak with the traditional RAG architecture are the retriever and generator components
 For the retriever you can use a different embedding model, a different form of vector search, or how many retrieved documents to consider. This allows for the retriever to be optimized for how many documents are retrieved and the relevance of those documents against the engineering constraints of latency, DB size, and cost.
@@ -161,13 +159,15 @@ Typically as the dataset is ingested and split up into chunks, various metadata 
 
 ## Retrieval
 
+![Retriever](assets/Retriever.mmd.svg)
+
 - Sentence-Window Retrieval
 - Auto-Merging
 - Query Rewriting
 - Multi-Hop Retrieval
 - Re-ranking
 
-## Context Relevance Filtering
+### Context Relevance Filtering
 
 - Relevance Scoring
 - Thresholding
@@ -179,6 +179,8 @@ Typically as the dataset is ingested and split up into chunks, various metadata 
 - User Feedback Integration
 
 ## Generation
+
+![Generator](assets/Generator.mmd.svg)
 
 - Source Attribution
 - Answer Generation

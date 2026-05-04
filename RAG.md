@@ -3,20 +3,31 @@
 This document provides an overview of Retrieval-Augmented Generation (RAG) systems, serving as a reference for key concepts and considerations for: architecture, data ingestion strategies, retrieval techniques, context relevance filtering, generation methods, evaluation measures, security concerns, and tools/frameworks in the RAG ecosystem.
 
 - [RAG](#rag)
+  - [Purpose of RAG](#purpose-of-rag)
   - [RAG Terminology](#rag-terminology)
   - [Architecture](#architecture)
-  - [Data Ingestion](#data-ingestion)
-    - [Preprocessing](#preprocessing)
-    - [Engineering considerations](#engineering-considerations)
-    - [Chunking](#chunking)
-    - [Embeddings](#embeddings)
-    - [Metadata](#metadata)
   - [Retrieval](#retrieval)
+    - [Data Ingestion](#data-ingestion)
+      - [Preprocessing](#preprocessing)
+      - [Engineering considerations](#engineering-considerations)
+      - [Chunking](#chunking)
+      - [Embeddings](#embeddings)
+      - [Metadata](#metadata)
+    - [Retriever](#retriever)
     - [Context Relevance Filtering](#context-relevance-filtering)
   - [Generation](#generation)
-  - [Evaluation Measures](#evaluation-measures)
+  - [Evaluation](#evaluation)
+  - [Business considerations](#business-considerations)
   - [Security Concerns](#security-concerns)
   - [RAG Tools and Frameworks](#rag-tools-and-frameworks)
+
+## Purpose of RAG
+
+RAG at it's heart is a relavtively simple concept, allowing a user to input a query, search through a corpus of documents to retrieve relevant information, and then use that information passed into a Large Language Model (LLM) to generate a response to the original query. With the different variations of RAG architectures making changes to how information is retrived and how the LLM uses that information to generate a response.
+
+With a clue in the name (**Retrieval**-Augmented Generation), RAG is best used when you have a large corpus of documents that you are able to retrieve relevant information related to the query, leading to accurate and relevant responses based on the information in those documents. RAG can help improve the accuracy and relevance of responses by grounding them in retrieved evidence, rather than relying solely on the model's internal knowledge which may be outdated or incomplete.
+
+On the otherhand, if there is only a small corpus of documents that can be easily ingested into the model's context window, or you don't require specific retrieved information. RAG may not be necessary and a more traditional LLM approach may be sufficient.
 
 ## RAG Terminology
 
@@ -47,11 +58,6 @@ A RAG system is generally made up of two main components: the first being a retr
 
 ![Vector search architecture](assets/RAG.mmd.svg)
 
-The main things to tweak with the traditional RAG architecture are the retriever and generator components
-For the retriever you can use a different embedding model, a different form of vector search, or how many retrieved documents to consider. This allows for the retriever to be optimized for how many documents are retrieved and the relevance of those documents against the engineering constraints of latency, DB size, and cost.
-
-For the generator you can use a large language model, temperature, or system prompt. This allows the generator to be optimized for the quality of the final answer, the creativity of the response, and how much it relies on the retrieved context.
-
 **Memory RAG**: Similar to vector search but with a focus on maintaining a dynamic memory of past interactions and retrieved information.
 This has the potential to improve the relevance of retrieved information by considering the context of previous queries and responses, allowing for more personalized and context-aware generation.
 
@@ -77,7 +83,15 @@ This has the potential to improve the relevance of retrieved information by cons
 
 ![Agentic RAG architecture](assets/Agentic_rag.mmd.svg)
 
-## Data Ingestion
+**LLM Wiki**: A system similar to RAG to build a dynamic knowledge base that can be updated and queried by an LLM, allowing for more accurate and up-to-date information retrieval. Unlike a RAG based system, the architecture of this system doesn't create an embedding for the original document but instead at ingestion time it will summerise a document and create a document based knowledge base created and maintained by the LLM itself.
+
+At query time, the LLM will reference this knowledge base to find the answer to generate a response.
+
+## Retrieval
+
+For the retriever you can use a different embedding model, a different form of vector search, or how many retrieved documents to consider. This allows for the retriever to be optimized for how many documents are retrieved and the relevance of those documents against the engineering constraints of latency, DB size, and cost.
+
+### Data Ingestion
 
 Data ingestion strategies for RAG systems can vary based on the use case and requirements. Some common approaches include:
 
@@ -92,20 +106,20 @@ Data comes in many forms and from many sources, and the ingestion strategy and p
 - Text data (HTML, Markdown, TXT) - requires parsing and cleaning
 - Structured data (spreadsheets)
 
-### Preprocessing
+#### Preprocessing
 
 - Text extraction, cleaning, and normalization
 - Document deduplication
 - OCR for images/documents
 
-### Engineering considerations
+#### Engineering considerations
 
 - Compression techniques
 - Caching strategies
 - Scalability considerations
 - Cost optimization (e.g., embedding model selection)
 
-### Chunking
+#### Chunking
 
 For textual documents, different chunking strategies can be employed to break down documents into manageable pieces for retrieval and generation. Ideally we want to minimize the amount of irrelevant information included in each chunk while maximizing the amount of relevant information.
 
@@ -130,7 +144,7 @@ Other strategies may involve more complex approaches such as:
 - Recursive Character Splitting
 - Parent / Child ?? Late Chunking??
 
-### Embeddings
+#### Embeddings
 
 - Dense Embeddings: models like BERT, RoBERTa, or Sentence Transformers to create dense vector representations of documents and queries.
 - Contextual Embeddings: models that generate embeddings based on the context of the query and document (e.g., using cross-encoders).
@@ -143,7 +157,7 @@ Other strategies may involve more complex approaches such as:
 - Hybrid Approaches / combining embeddings with keyword search: using embeddings for semantic similarity while also leveraging keyword matches for precision.
 - Knowledge Graph Embeddings: representing entities and relationships in a knowledge graph as vectors for retrieval.
 
-### Metadata
+#### Metadata
 
 Typically as the dataset is ingested and split up into chunks, various metadata is stored along with the chunk to provide additional context and information for retrieval and generation. Common metadata fields include:
 
@@ -157,7 +171,7 @@ Typically as the dataset is ingested and split up into chunks, various metadata 
 - Tags
 - Embedding / Chunking strategy
 
-## Retrieval
+### Retriever
 
 ![Retriever](assets/Retriever.mmd.svg)
 
@@ -180,6 +194,8 @@ Typically as the dataset is ingested and split up into chunks, various metadata 
 
 ## Generation
 
+For the generator you can use a large language model, temperature, or system prompt. This allows the generator to be optimized for the quality of the final answer, the creativity of the response, and how much it relies on the retrieved context.
+
 ![Generator](assets/Generator.mmd.svg)
 
 - Source Attribution
@@ -190,7 +206,7 @@ Typically as the dataset is ingested and split up into chunks, various metadata 
 - Counterfactual Generation
 - Self-Consistency / Self-Verification
 
-## Evaluation Measures
+## Evaluation
 
 - Context Relevance
 - Groundedness
@@ -200,6 +216,14 @@ Typically as the dataset is ingested and split up into chunks, various metadata 
 - F1 scores
 - Human evaluation (accuracy, helpfulness, faithfulness)
 - Hallucination rate
+
+## Business considerations
+
+- Cost of embedding and retrieval infrastructure
+- Latency requirements for retrieval and generation
+- Maintenance and updating of the document corpus
+- User experience and interface design for presenting retrieved information
+- Compliance and data privacy considerations for sensitive documents
 
 ## Security Concerns
 

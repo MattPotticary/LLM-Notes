@@ -1,0 +1,12 @@
+flowchart TD
+    Query[Query]
+    LLM[LLM]
+    subgraph Knowledge base
+        Index[Index]
+        Wiki[Wiki]
+    end
+    Query --> LLM
+    LLM --> Index
+    Index --> Wiki
+    Wiki --> LLM
+    LLM --> Output[Output text]

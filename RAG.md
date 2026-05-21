@@ -7,7 +7,7 @@ This document provides an overview of Retrieval-Augmented Generation (RAG) syste
   - [RAG Terminology](#rag-terminology)
   - [Architecture](#architecture)
   - [Retrieval](#retrieval)
-    - [Data Ingestion](#data-ingestion)
+    - [Corpus Ingestion](#corpus-ingestion)
       - [Preprocessing](#preprocessing)
       - [Engineering considerations](#engineering-considerations)
       - [Chunking](#chunking)
@@ -91,16 +91,16 @@ At query time, the LLM will reference this knowledge base to find the answer to 
 
 For the retriever you can use a different embedding model, a different form of vector search, or how many retrieved documents to consider. This allows for the retriever to be optimized for how many documents are retrieved and the relevance of those documents against the engineering constraints of latency, DB size, and cost.
 
-### Data Ingestion
+### Corpus Ingestion
 
-Data ingestion strategies for RAG systems can vary based on the use case and requirements. Some common approaches include:
+Corpus ingestion strategies for RAG systems can vary based on the use case and requirements. Some common approaches include:
 
 - Static: One-time batch ingestion of a fixed corpus.
 - Dynamic: Continuous updating of the corpus with new information.
 - Batch: Periodic ingestion of data in batches.
 - Streaming: Immediate ingestion of data as it becomes available.
 
-Data comes in many forms and from many sources, and the ingestion strategy and preprocessing will depend on the specific use case. Some common data sources include:
+Corpuses comes in many forms and from many sources, and the ingestion strategy and preprocessing will depend on the specific use case. Some common data sources include:
 
 - Binary formats (images, audio, video, PDFs) - requires specialized processing (OCR, speech-to-text)
 - Text data (HTML, Markdown, TXT) - requires parsing and cleaning
@@ -143,6 +143,8 @@ Other strategies may involve more complex approaches such as:
 
 - Recursive Character Splitting
 - Parent / Child ?? Late Chunking??
+
+Chunk overlapping
 
 #### Embeddings
 

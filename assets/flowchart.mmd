@@ -1,0 +1,58 @@
+flowchart TD
+	A([Start: Select RAG Architecture]) --> B{Need continuity across
+	user sessions?}
+
+	B -->|Yes| M[Memory RAG]
+	B -->|No| C{Primary data includes
+	images, charts, tables,
+	scanned PDFs?}
+
+	C -->|Yes| MM[Multimodal RAG]
+	C -->|No| D{Need strict joins,
+	metrics, or database truth?}
+
+	D -->|Yes| S[Structured-Data RAG
+	Text-to-SQL + docs]
+	D -->|No| E{Need entity + relationship
+	reasoning across sources?}
+
+	E -->|Yes| F{Need global thematic
+	synthesis across many docs?}
+	E -->|No| G{Are queries often vague
+	or underspecified?}
+
+	F -->|Yes| GR[GraphRAG]
+	F -->|No| H[Hybrid RAG
+	Knowledge Graph + Vector]
+
+	G -->|Yes| I{Want one-shot expansion
+	or multi-rewrite retrieval?}
+	G -->|No| J{Need adaptive tool use,
+	planning, and actions?}
+
+	I -->|One-shot query expansion| HY[HyDE]
+	I -->|Multiple rewrites + fusion| RF[RAG-Fusion]
+
+	J -->|Yes| AR[Agentic RAG]
+	J -->|No| K{Is corpus freshness
+	time-critical?}
+
+	K -->|Yes| T[Temporal or Streaming RAG]
+	K -->|No| L{Need retrieval self-check
+	and fallback correction?}
+
+	L -->|Yes| CR[CRAG]
+	L -->|No| N{Need model to decide
+	when to retrieve?}
+
+	N -->|Yes| SR[Self-RAG]
+	N -->|No| O{Long documents require
+	multi-level abstraction?}
+
+	O -->|Yes| R[RAPTOR]
+	O -->|No| P{Need precise chunk hit
+	with larger section context?}
+
+	P -->|Yes| PC[Parent-Child RAG]
+	P -->|No| V[Vector Search RAG
+	Baseline]

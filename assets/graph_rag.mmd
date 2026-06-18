@@ -1,0 +1,12 @@
+flowchart TD
+    A[/Query/] --> B[Retriever]
+    B --> L[Knowledge Graph]
+    B --> R[Vector Store]
+    L --> R
+    R --> L
+    B --> G[Generator]
+    G --> T[/Output/]
+	query:B --> T:retriever
+	retriever:L -- R:kg
+	retriever:R -- L:vectorstore
+	generator:B --> T:output

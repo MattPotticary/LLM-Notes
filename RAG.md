@@ -3,31 +3,40 @@
 This document provides an overview of Retrieval-Augmented Generation (RAG) systems, serving as a reference for key concepts and considerations for: architecture, data ingestion strategies, retrieval techniques, context relevance filtering, generation methods, evaluation measures, security concerns, and tools/frameworks in the RAG ecosystem.
 
 - [RAG](#rag)
- [Purpose of RAG](#purpose-of-rag)
- [RAG Terminology](#rag-terminology)
- [Architecture](#architecture)
-    [GraphRAG](#graphrag)
-    [RAPTOR (Recursive Abstractive Processing for Tree-Organized Retrieval)](#raptor-recursive-abstractive-processing-for-tree-organized-retrieval)
-    [Hierarchical Parent-Child RAG](#hierarchical-parent-child-rag)
-    [RAG-Fusion / Multi-Query RAG](#rag-fusion--multi-query-rag)
-    [Router RAG](#router-rag)
-    [Multimodal RAG](#multimodal-rag)
-    [Structured-Data RAG (Text-to-SQL + Unstructured Fusion)](#structured-data-rag-text-to-sql--unstructured-fusion)
-    [Temporal / Streaming RAG](#temporal--streaming-rag)
- [Retrieval](#retrieval)
-  [Corpus Ingestion](#corpus-ingestion)
-   [Preprocessing](#preprocessing)
-   [Engineering considerations](#engineering-considerations)
-   [Chunking](#chunking)
-   [Embeddings](#embeddings)
-   [Metadata](#metadata)
-  [Retriever](#retriever)
-  [Context Relevance Filtering](#context-relevance-filtering)
- [Generation](#generation)
- [Evaluation](#evaluation)
- [Business considerations](#business-considerations)
- [Security Concerns](#security-concerns)
- [RAG Tools and Frameworks](#rag-tools-and-frameworks)
+  - [Purpose of RAG](#purpose-of-rag)
+  - [RAG Terminology](#rag-terminology)
+  - [Architecture](#architecture)
+    - [Architecture comparison table](#architecture-comparison-table)
+    - [Vector search](#vector-search)
+    - [Memory RAG](#memory-rag)
+    - [Hybrid RAG (Knowledge graphs)](#hybrid-rag-knowledge-graphs)
+    - [Hypothetical Document Embeddings (HyDE)](#hypothetical-document-embeddings-hyde)
+    - [Corrective RAG (CRAG)](#corrective-rag-crag)
+    - [Self-RAG](#self-rag)
+    - [Agentic RAG](#agentic-rag)
+    - [LLM Wiki](#llm-wiki)
+    - [GraphRAG](#graphrag)
+    - [RAPTOR (Recursive Abstractive Processing for Tree-Organized Retrieval)](#raptor-recursive-abstractive-processing-for-tree-organized-retrieval)
+    - [Hierarchical Parent-Child RAG](#hierarchical-parent-child-rag)
+    - [RAG-Fusion / Multi-Query RAG](#rag-fusion--multi-query-rag)
+    - [Router RAG](#router-rag)
+    - [Multimodal RAG](#multimodal-rag)
+    - [Structured-Data RAG (Text-to-SQL + Unstructured Fusion)](#structured-data-rag-text-to-sql--unstructured-fusion)
+    - [Temporal / Streaming RAG](#temporal--streaming-rag)
+  - [Retrieval](#retrieval)
+    - [Corpus Ingestion](#corpus-ingestion)
+      - [Preprocessing](#preprocessing)
+      - [Engineering considerations](#engineering-considerations)
+      - [Chunking](#chunking)
+      - [Embeddings](#embeddings)
+      - [Metadata](#metadata)
+    - [Retriever](#retriever)
+    - [Context Relevance Filtering](#context-relevance-filtering)
+  - [Generation](#generation)
+  - [Evaluation](#evaluation)
+  - [Business considerations](#business-considerations)
+  - [Security Concerns](#security-concerns)
+  - [RAG Tools and Frameworks](#rag-tools-and-frameworks)
 
 ## Purpose of RAG
 
@@ -90,7 +99,9 @@ A RAG system is generally made up of two main components: the first being a retr
 
 This table is intended as a quick selection guide. In practice, many production systems combine multiple patterns for example Router RAG may delegate to Hybrid RAG, Structured-Data RAG, or Multimodal RAG depending on query intent.
 
-**Vector search**: The foundational and most widely deployed RAG pattern. At ingestion time, documents are split into chunks, and each chunk is passed through an embedding model to produce a dense vector that encodes semantic meaning. These vectors are stored in a vector database alongside the original text and any associated metadata. At query time, the same embedding model converts the user's query into a vector, and an approximate nearest-neighbour (ANN) search algorithm such as HNSW or IVF retrieves the top-K chunks whose vectors are closest in the high-dimensional embedding space. The retrieved chunks are then concatenated into the prompt context passed to the LLM alongside the original query, and the LLM generates a grounded response based on that evidence.
+### Vector search
+
+The foundational and most widely deployed RAG pattern. At ingestion time, documents are split into chunks, and each chunk is passed through an embedding model to produce a dense vector that encodes semantic meaning. These vectors are stored in a vector database alongside the original text and any associated metadata. At query time, the same embedding model converts the user's query into a vector, and an approximate nearest-neighbour (ANN) search algorithm such as HNSW or IVF retrieves the top-K chunks whose vectors are closest in the high-dimensional embedding space. The retrieved chunks are then concatenated into the prompt context passed to the LLM alongside the original query, and the LLM generates a grounded response based on that evidence.
 
 The key design decisions in a vector search RAG system are the choice of embedding model (which determines what "similarity" means), the chunking strategy (which controls how much context each retrieved unit carries), and the index configuration (which governs the trade-off between retrieval speed and recall accuracy).
 
@@ -136,7 +147,9 @@ The key design decisions in a vector search RAG system are the choice of embeddi
 - **Scalability costs**: Storage and query costs increase with corpus size; can become expensive for very large datasets
 - **Integration complexity**: Requires coordination between embedding service, vector DB, and LLM; multiple failure points
 
-**Memory RAG**: Extends traditional vector search by adding a persistent memory layer that accumulates knowledge from past interactions. Memory is typically structured across multiple tiers: short-term or session memory holds the recent conversation history and retrieved context for the current interaction; long-term memory stores distilled facts, user preferences, or summaries of past sessions across many interactions.
+### Memory RAG
+
+Extends traditional vector search by adding a persistent memory layer that accumulates knowledge from past interactions. Memory is typically structured across multiple tiers: short-term or session memory holds the recent conversation history and retrieved context for the current interaction; long-term memory stores distilled facts, user preferences, or summaries of past sessions across many interactions.
 
 At query time, the retriever pulls from both the main document corpus and the memory store. Retrieved memory entries are injected into the prompt alongside standard document context, allowing the LLM to reason over what it already knows about the user or topic. A memory management process runs alongside the main flow to decide what to write to memory, what to update, and what to evict often using importance scoring, recency weighting, or explicit LLM-driven summarization.
 
@@ -174,7 +187,9 @@ This architecture is commonly used in long-lived assistant scenarios such as ent
 - **Higher implementation complexity**: Durable memory adds product and platform complexity beyond a stateless RAG flow
 - **Trust sensitivity**: Users may lose confidence quickly if the system remembers incorrect or unwanted information
 
-**Hybrid RAG (Knowledge graphs)**: Augments vector similarity search with a structured knowledge graph (KG) that represents entities, their properties, and the relationships between them. The KG is typically constructed during ingestion using an entity and relation extraction pipeline often LLM-assisted which identifies named entities (people, organisations, products, concepts) and the typed edges connecting them, then stores them in a graph database such as Neo4j.
+### Hybrid RAG (Knowledge graphs)
+
+Augments vector similarity search with a structured knowledge graph (KG) that represents entities, their properties, and the relationships between them. The KG is typically constructed during ingestion using an entity and relation extraction pipeline often LLM-assisted which identifies named entities (people, organisations, products, concepts) and the typed edges connecting them, then stores them in a graph database such as Neo4j.
 
 At query time, two retrieval paths run in parallel or in sequence. The vector path performs standard semantic search over chunked documents to retrieve relevant passages. The graph path parses the query for entity mentions, traverses the knowledge graph to find related entities and relationships, and returns structured facts or sub-graphs as additional context. The results from both paths are merged usually by a ranker or fusion layer before being passed to the LLM.
 
@@ -212,7 +227,9 @@ This dual-path approach enables the LLM to answer questions that require relatio
 - **Slower time-to-value**: Deployment timelines are longer than simpler vector-only systems
 - **Specialist dependency**: Often needs domain experts to define schemas and validate graph quality
 
-**Hypothetical Document Embeddings (HyDE)**: Addresses a core mismatch in standard vector search the fact that a short, terse user query often embeds very differently from the longer, richer document passages that contain the answer. HyDE resolves this by shifting the embedding from the raw query to a synthetic, hypothetical document.
+### Hypothetical Document Embeddings (HyDE)
+
+Addresses a core mismatch in standard vector search the fact that a short, terse user query often embeds very differently from the longer, richer document passages that contain the answer. HyDE resolves this by shifting the embedding from the raw query to a synthetic, hypothetical document.
 
 At query time, the LLM is given the user's question and asked to generate a plausible answer as if it were a passage from a relevant document without access to the actual corpus. This hypothetical document is then embedded and used as the search vector to retrieve real corpus chunks. Because the hypothetical document is written in the same style, length, and vocabulary as the documents in the index, its embedding is more likely to be geometrically close to the embeddings of genuinely relevant chunks than the short query embedding would be.
 
@@ -250,13 +267,15 @@ The retrieved real documents are then passed along with the original query to th
 - **Less predictable ROI**: Gains may be strong for some query classes and weak for others
 - **Harder to validate**: Teams must evaluate both retrieval quality and the quality of the hypothetical query expansion
 
-**Corrective RAG (CRAG)**: Introduces a self-evaluation step between retrieval and generation that assesses the quality of retrieved documents before they are used to produce an answer. Rather than blindly passing top-K chunks to the LLM, CRAG uses a lightweight evaluator typically a prompted LLM or fine-tuned classifier to score each retrieved document for relevance to the query.
+### Corrective RAG (CRAG)
+
+Introduces a self-evaluation step between retrieval and generation that assesses the quality of retrieved documents before they are used to produce an answer. Rather than blindly passing top-K chunks to the LLM, CRAG uses a lightweight evaluator typically a prompted LLM or fine-tuned classifier to score each retrieved document for relevance to the query.
 
 Based on the scores, the system takes one of three paths. If retrieved documents are judged highly relevant, they are passed directly to the generator. If documents are partially relevant, a knowledge refinement step extracts only the most pertinent sentences or sub-sections before generation. If all retrieved documents are judged irrelevant or the corpus appears insufficient, the system triggers a fallback strategy commonly web search or an alternative retrieval source to obtain better evidence before proceeding.
 
 This corrective loop means the generator only ever receives evidence that has passed a minimum quality threshold, significantly reducing the risk of confidently wrong answers caused by irrelevant context being included in the prompt. CRAG is particularly effective for open-domain questions where the indexed corpus may have uneven coverage.
 
-![Corrective RAG architecture](assets/Cor_rag.svg)
+![Corrective RAG architecture](assets/Cor_rag.mmd.svg)
 
 **Strengths:**
 
@@ -288,7 +307,9 @@ This corrective loop means the generator only ever receives evidence that has pa
 - **Less predictable SLAs**: Response time varies more depending on how many correction loops are triggered
 - **Greater support burden**: Production debugging and incident analysis are harder than in a single-pass system
 
-**Self-RAG**: Trains the LLM itself to control its own retrieval behaviour through a set of special reflection tokens inserted into the generation process. Rather than treating retrieval as an external pipeline step that always runs, Self-RAG teaches the model to decide dynamically whether to retrieve at all, to evaluate the usefulness of retrieved passages, and to assess the quality of its own generated output.
+### Self-RAG
+
+Trains the LLM itself to control its own retrieval behaviour through a set of special reflection tokens inserted into the generation process. Rather than treating retrieval as an external pipeline step that always runs, Self-RAG teaches the model to decide dynamically whether to retrieve at all, to evaluate the usefulness of retrieved passages, and to assess the quality of its own generated output.
 
 The model uses four categories of reflection token. A retrieve token indicates whether retrieval is needed for a given segment of the response. ISREL tokens score each retrieved passage for relevance to the query. ISSUP tokens assess whether the generated text is actually supported by the retrieved evidence. ISUSE tokens rate the overall utility of the generated response. These tokens are generated inline with the output text, making the model's reasoning about retrieval an explicit, observable part of its behaviour.
 
@@ -326,7 +347,9 @@ During inference, the model may generate parts of a response from its own parame
 - **Harder quality assurance**: Teams must test both answer quality and retrieval-decision quality
 - **Vendor lock-in risk**: Advanced self-reflective behavior may depend on specific models or proprietary tuning
 
-**Agentic RAG**: Embeds retrieval as one capability among many within an autonomous agent loop, enabling the system to plan, act, observe, and iterate rather than executing a fixed retrieval-then-generate pipeline. The agent is given a set of tools which may include one or more retrieval functions, web search, code execution, API calls, calculators, and database queries and uses a reasoning framework such as ReAct (Reason + Act) or Plan-and-Execute to decide which tools to invoke, in what order, and how to interpret their results.
+### Agentic RAG
+
+Embeds retrieval as one capability among many within an autonomous agent loop, enabling the system to plan, act, observe, and iterate rather than executing a fixed retrieval-then-generate pipeline. The agent is given a set of tools which may include one or more retrieval functions, web search, code execution, API calls, calculators, and database queries and uses a reasoning framework such as ReAct (Reason + Act) or Plan-and-Execute to decide which tools to invoke, in what order, and how to interpret their results.
 
 When a user submits a complex query, the agent first plans a sequence of steps to gather sufficient evidence. It may perform multiple retrieval calls with different queries, cross-reference results from different tools, validate intermediate conclusions, and re-plan if early results are insufficient. Only once the agent judges it has enough grounded evidence does it synthesize a final response.
 
@@ -364,11 +387,15 @@ Agentic RAG systems can also be implemented as multi-agent pipelines where speci
 - **Governance difficulty**: Action-taking systems need stronger controls, auditing, and approval patterns
 - **Expectation management challenges**: Users may overestimate reliability if the system appears highly autonomous
 
-**LLM Wiki**: Departs from the chunk-and-embed retrieval model used by most RAG variants. Instead of preserving raw document text for retrieval, LLM Wiki uses the LLM itself to transform source documents into a structured, navigable knowledge base at ingestion time analogous to a collaboratively maintained wiki, but generated and updated entirely by the model.
+### LLM Wiki
+
+LLM Wiki departs from the chunk-and-embed retrieval model used by most RAG variants. Instead of preserving raw document text for retrieval, LLM Wiki uses the LLM itself to transform source documents into a structured, navigable knowledge base at ingestion time analogous to a collaboratively maintained wiki, but generated and updated entirely by the model.
 
 During ingestion, each source document is processed by the LLM, which produces one or more structured knowledge entries: summaries, factual extractions, concept definitions, or cross-references to related topics. These entries are written into the knowledge base using a consistent schema, and existing entries are updated or merged when new documents introduce overlapping information. The original raw documents are not stored for retrieval the knowledge base is the primary artefact.
 
 At query time, the LLM receives the question alongside a structured view of relevant knowledge base entries (selected by keyword lookup, classification, or lightweight semantic routing rather than dense vector search). It generates its response directly from the curated entries, which are already in a concise, consistent format optimised for comprehension rather than raw retrieval. This approach trades the verbatim faithfulness of passage-level retrieval for a more distilled, human-readable knowledge representation that can be easier to query, browse, and maintain for well-bounded domains.
+
+![LLM Wiki architecture](assets/LLM_wiki.mmd.svg)
 
 **Strengths:**
 
@@ -400,7 +427,9 @@ At query time, the LLM receives the question alongside a structured view of rele
 - **Auditability concerns**: Regulated or evidence-heavy use cases may prefer direct passage retrieval over synthesized knowledge
 - **Risk of institutionalized errors**: Incorrect summaries can spread broadly because they become canonical within the system
 
-**GraphRAG**: Extends graph-enhanced retrieval by constructing an explicit graph of entities, communities, and relationships, then generating hierarchical summaries over those graph communities during ingestion. At query time, the system can retrieve both local evidence (specific nodes/edges and source passages) and global evidence (community-level summaries), then combine them for generation.
+### GraphRAG
+
+Extends graph-enhanced retrieval by constructing an explicit graph of entities, communities, and relationships, then generating hierarchical summaries over those graph communities during ingestion. At query time, the system can retrieve both local evidence (specific nodes/edges and source passages) and global evidence (community-level summaries), then combine them for generation.
 
 Unlike basic hybrid KG + vector retrieval, GraphRAG emphasizes graph-aware summarization and global-to-local traversal. This improves performance for questions that need high-level synthesis across many documents as well as precise fact lookup.
 
@@ -429,7 +458,9 @@ Unlike basic hybrid KG + vector retrieval, GraphRAG emphasizes graph-aware summa
 - **Higher implementation cost**: More infrastructure and tuning effort than conventional RAG
 - **Longer time-to-production**: Additional graph and summarization stages slow rollout
 
-**RAPTOR (Recursive Abstractive Processing for Tree-Organized Retrieval)**: Builds a hierarchical tree of summaries over the corpus. Leaf nodes are original chunks, while parent nodes recursively summarize child nodes at increasing abstraction levels. At query time, retrieval can select nodes from multiple levels of the tree, balancing detail and breadth before generation.
+### RAPTOR (Recursive Abstractive Processing for Tree-Organized Retrieval)
+
+Builds a hierarchical tree of summaries over the corpus. Leaf nodes are original chunks, while parent nodes recursively summarize child nodes at increasing abstraction levels. At query time, retrieval can select nodes from multiple levels of the tree, balancing detail and breadth before generation.
 
 This architecture is especially effective for long documents and large corpora where single-level chunk retrieval can miss global context.
 
@@ -458,7 +489,9 @@ This architecture is especially effective for long documents and large corpora w
 - **Higher indexing cost**: Building and refreshing the tree is more expensive than flat chunk indexes
 - **Operational complexity**: Requires monitoring both leaf-level and summary-level retrieval quality
 
-**Hierarchical Parent-Child RAG**: Indexes fine-grained child chunks for retrieval precision while preserving links to larger parent units such as section, page, or document. Retrieval is performed over child chunks, then parent context is expanded into the prompt so the model receives surrounding context when needed.
+### Hierarchical Parent-Child RAG
+
+Indexes fine-grained child chunks for retrieval precision while preserving links to larger parent units such as section, page, or document. Retrieval is performed over child chunks, then parent context is expanded into the prompt so the model receives surrounding context when needed.
 
 This pattern improves grounding when isolated chunks are too narrow and is often paired with late chunking or context expansion policies.
 
@@ -487,7 +520,9 @@ This pattern improves grounding when isolated chunks are too narrow and is often
 - **Tuning burden**: Teams must calibrate expansion logic for each corpus type
 - **Variable latency/cost**: Query cost can vary with how much parent context is injected
 
-**RAG-Fusion / Multi-Query RAG**: Generates multiple query variants (rewrites, decompositions, perspective shifts), retrieves results for each variant, and fuses rankings into a unified candidate set using methods such as Reciprocal Rank Fusion (RRF). The final context is selected from the fused list and passed to generation.
+### RAG-Fusion / Multi-Query RAG
+
+Generates multiple query variants (rewrites, decompositions, perspective shifts), retrieves results for each variant, and fuses rankings into a unified candidate set using methods such as Reciprocal Rank Fusion (RRF). The final context is selected from the fused list and passed to generation.
 
 This approach improves recall for ambiguous or underspecified user questions.
 
@@ -516,7 +551,9 @@ This approach improves recall for ambiguous or underspecified user questions.
 - **Higher per-query cost**: More embedding/search operations increase serving cost
 - **Diminishing returns**: Extra query variants may add noise after a certain point
 
-**Router RAG**: Uses a routing layer to choose the best retrieval path per query for example lexical search, dense vector search, graph traversal, SQL retrieval, or web search. Routing can be rule-based, classifier-based, or LLM-driven, and may also choose a generation strategy.
+### Router RAG
+
+Uses a routing layer to choose the best retrieval path per query for example lexical search, dense vector search, graph traversal, SQL retrieval, or web search. Routing can be rule-based, classifier-based, or LLM-driven, and may also choose a generation strategy.
 
 Instead of one static pipeline for all queries, Router RAG adapts the stack to query intent and data modality.
 
@@ -545,7 +582,9 @@ Instead of one static pipeline for all queries, Router RAG adapts the stack to q
 - **Governance complexity**: More components increase operational ownership and incident surface
 - **Harder QA**: Teams must test both route selection and downstream retrieval quality
 
-**Multimodal RAG**: Extends retrieval beyond plain text to include tables, charts, images, diagrams, and scanned documents. Ingestion typically uses modality-specific parsing and embeddings (e.g., OCR + layout parsing for PDFs, vision encoders for images), while query-time retrieval fuses evidence across modalities before generation.
+### Multimodal RAG
+
+Extends retrieval beyond plain text to include tables, charts, images, diagrams, and scanned documents. Ingestion typically uses modality-specific parsing and embeddings (e.g., OCR + layout parsing for PDFs, vision encoders for images), while query-time retrieval fuses evidence across modalities before generation.
 
 This architecture is critical when key information is stored in non-textual artefacts.
 
@@ -574,7 +613,9 @@ This architecture is critical when key information is stored in non-textual arte
 - **Higher infrastructure cost**: Multiple models and parsers increase compute and storage needs
 - **Longer implementation timelines**: More engineering and evaluation effort than text-only RAG
 
-**Structured-Data RAG (Text-to-SQL + Unstructured Fusion)**: Combines retrieval from structured systems (databases, warehouses, metrics stores) with unstructured document retrieval. At query time, the system may generate and execute SQL (or equivalent), retrieve supporting passages from documents, and fuse both evidence types into a grounded final answer.
+### Structured-Data RAG (Text-to-SQL + Unstructured Fusion)
+
+Combines retrieval from structured systems (databases, warehouses, metrics stores) with unstructured document retrieval. At query time, the system may generate and execute SQL (or equivalent), retrieve supporting passages from documents, and fuse both evidence types into a grounded final answer.
 
 This architecture is common in analytics copilots where users need both numeric truth from databases and explanatory context from docs.
 
@@ -603,7 +644,9 @@ This architecture is common in analytics copilots where users need both numeric 
 - **Security and access-control burden**: Requires strict governance across databases and document stores
 - **Higher maintenance overhead**: Schema drift and policy changes require frequent updates
 
-**Temporal / Streaming RAG**: Introduces time-aware indexing and retrieval for continuously changing corpora such as logs, incidents, market feeds, or news. The system updates indexes incrementally, applies recency-aware ranking, and may enforce temporal filters (e.g., "last 24 hours") during retrieval.
+### Temporal / Streaming RAG
+
+Introduces time-aware indexing and retrieval for continuously changing corpora such as logs, incidents, market feeds, or news. The system updates indexes incrementally, applies recency-aware ranking, and may enforce temporal filters (e.g., "last 24 hours") during retrieval.
 
 This pattern prevents stale answers in fast-changing domains where static batch indexing is insufficient.
 
